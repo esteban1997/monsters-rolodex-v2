@@ -1,11 +1,46 @@
-import {Component} from 'react'
+import { useState,useEffect } from 'react';
 
-//import logo from './logo.svg';
 import './App.css';
 import CardList from './components/card-list/card-list.component';
 import SearchBox from './components/search-box/search-box.component'; 
 
-class App extends Component {
+const App = () =>{
+console.log('render')
+  const [searchField,setSearchField] = useState('');
+  const [monsters,setMonsters] = useState([]);
+  const [filteredMonsters,setFilteredMonsters] = useState(monsters);
+
+  //primer valor es la funcion que crea ddependencias, el segunddo array son las dependdencias de cuando quiero qeu se vuelva
+  //a ejecutar la funcion, el [] vacio implica nunca mas quiero que se vuelva a ejecutar, es el equivalente a componentDidMount
+  useEffect(()=>{
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(response=>response.json())
+    .then(
+      (users)=> setMonsters(users))
+  },[])
+
+  useEffect(()=>{
+    const newFilteredMonsters = monsters.filter((monster)=>{
+      return monster.name.toLowerCase().includes(searchField);
+    });
+    setFilteredMonsters(newFilteredMonsters)
+  },[monsters,searchField])
+
+  const onSearchChange = (event)=>{
+      const searchFieldString = event.target.value.toLowerCase();
+      setSearchField(searchFieldString);
+    }
+
+  
+
+  return(<div className="App">
+    <h1 className='app-title'>Monster rolodex</h1>
+    <SearchBox className='monsters-search-box' placeholder='Monster search placeholder' onChangeHandler = {onSearchChange}></SearchBox>
+    <CardList monsters = {filteredMonsters}></CardList>
+</div>)
+}
+
+/*class App extends Component {
 
   constructor(){
     super();
@@ -51,6 +86,6 @@ class App extends Component {
       </div>
     );
   }
-}
+}*/
 
 export default App;
